@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<title>OS GLOBAL Brand Studio</title>
+<style>
+  :root{
+    --gold1:#8a6a1c; --gold2:#f3d76f; --gold3:#d4af37; --gold4:#fff3b8;
+    --bg:#070707; --card:#111; --line:#3a2f12;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg);color:#eee;font-family:Georgia,"Times New Roman",serif}
+  body{min-height:100vh;display:flex;flex-direction:column}
+
+  header{
+    background:#000;border-bottom:2px solid var(--gold3);
+    padding:22px 16px;text-align:center;
+  }
+  header h1{
+    font-size:clamp(22px,6vw,40px);letter-spacing:.12em;text-transform:uppercase;font-weight:700;
+    background:linear-gradient(90deg,#8a6a1c,#f3d76f 30%,#fff3b8 50%,#d4af37 70%,#8a6a1c);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+  }
+  header p{margin-top:6px;font-size:13px;color:#9b8a52;letter-spacing:.2em;text-transform:uppercase}
+
+  main{flex:1;width:100%;max-width:1200px;margin:0 auto;padding:20px 14px 30px}
+
+  .panel{
+    background:linear-gradient(180deg,#121212,#0a0a0a);
+    border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:22px;
+  }
+  .upload-row{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:center}
+  .btn{
+    display:inline-block;cursor:pointer;border:none;border-radius:999px;
+    padding:13px 26px;font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    font-family:inherit;text-decoration:none;text-align:center;color:#000;
+    background:linear-gradient(135deg,#b8891f,#f3d76f 45%,#d4af37 70%,#fff3b8);
+    box-shadow:0 4px 18px rgba(212,175,55,.25);transition:transform .15s,box-shadow .15s;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn:hover{box-shadow:0 6px 24px rgba(243,215,111,.4)}
+  .btn.outline{background:transparent;color:var(--gold2);border:2px solid var(--gold3);box-shadow:none}
+  .btn.small{padding:10px 18px;font-size:13px;width:100%}
+  input[type=file]{display:none}
+
+  .preview-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .preview{
+    width:150px;height:150px;border-radius:14px;border:2px solid var(--gold3);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+    background-color:#444;
+    background-image:linear-gradient(45deg,#555 25%,transparent 25%),linear-gradient(-45deg,#555 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#555 75%),linear-gradient(-45deg,transparent 75%,#555 75%);
+    background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0;
+  }
+  .preview canvas{max-width:100%;max-height:100%}
+  .preview span{font-size:12px;color:#ccc;text-align:center;padding:8px;background:rgba(0,0,0,.6)}
+  .muted{font-size:12px;color:#8d8d8d}
+
+  .options{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:16px}
+  .field{display:flex;flex-direction:column;gap:4px;min-width:200px;flex:1;max-width:320px}
+  .field label{font-size:11px;color:#9b8a52;letter-spacing:.15em;text-transform:uppercase}
+  .field input[type=text]{
+    background:#000;border:1px solid var(--line);border-radius:10px;color:var(--gold2);
+    padding:10px 12px;font-size:15px;font-family:inherit;outline:none;
+  }
+  .field input[type=text]:focus{border-color:var(--gold3)}
+  .check{display:flex;align-items:center;gap:8px;font-size:13px;color:#ccc;align-self:flex-end;padding-bottom:10px}
+  .check input{width:18px;height:18px;accent-color:#d4af37}
+
+  #cards{display:none;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}
+  #cards.show{display:grid}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;
+    display:flex;flex-direction:column;gap:12px;
+  }
+  .card h2{
+    font-size:15px;letter-spacing:.14em;text-transform:uppercase;text-align:center;
+    background:linear-gradient(90deg,#b8891f,#fff3b8,#d4af37);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+  }
+  .stage{
+    border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;
+    background:#000;border:1px solid #222;min-height:120px;
+  }
+  .stage canvas{display:block;width:100%;height:auto;max-height:420px;object-fit:contain}
+  .stage.checker{
+    background-color:#3a3a3a;
+    background-image:linear-gradient(45deg,#4a4a4a 25%,transparent 25%),linear-gradient(-45deg,#4a4a4a 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#4a4a4a 75%),linear-gradient(-45deg,transparent 75%,#4a4a4a 75%);
+    background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0;
+  }
+  .dim{font-size:11px;color:#777;text-align:center;margin-top:-6px}
+
+  .empty{text-align:center;color:#8d8d8d;padding:30px 10px;font-size:14px;border:1px dashed var(--line);border-radius:14px}
+  #cards.show + .empty{display:none}
+
+  footer.bar{
+    position:sticky;bottom:0;background:rgba(0,0,0,.94);border-top:2px solid var(--gold3);
+    padding:12px 14px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;z-index:10;
+    backdrop-filter:blur(6px);
+  }
+  footer.bar .btn{flex:1 1 230px;max-width:380px}
+  .btn[disabled]{opacity:.4;pointer-events:none}
+  .credit{text-align:center;font-size:11px;color:#555;padding:10px 0 4px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>OS GLOBAL Brand Studio</h1>
+  <p>Luxury brand assets in seconds</p>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="upload-row">
+      <label class="btn" for="logoInput">⬆ Upload Logo</label>
+      <input type="file" id="logoInput" accept="image/png,image/jpeg,.png,.jpg,.jpeg">
+      <div class="preview-wrap">
+        <div class="preview" id="preview"><span>Logo preview appears here</span></div>
+        <div class="muted" id="logoInfo">PNG or JPG</div>
+      </div>
+    </div>
+
+    <div class="options">
+      <div class="field">
+        <label for="brandName">Brand name</label>
+        <input type="text" id="brandName" value="OS GLOBAL" maxlength="28">
+      </div>
+      <div class="field">
+        <label for="tagline">Tagline</label>
+        <input type="text" id="tagline" value="Building Legacy" maxlength="40">
+      </div>
+      <label class="check"><input type="checkbox" id="removeWhite"> Remove white background</label>
+    </div>
+  </section>
+
+  <section id="cards"></section>
+  <div class="empty">Upload your logo to generate your 6 luxury brand mockups.</div>
+</main>
+
+<footer class="bar">
+  <button class="btn outline" id="dlAll" disabled>⬇ Download All</button>
+  <a class="btn" href="https://selar.com/4413271b1v" target="_blank" rel="noopener">Unlock Full Brand Kit - $29</a>
+</footer>
+<div class="credit">© OS GLOBAL</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var logo = null;          // processed logo canvas
+  var srcCanvas = null;     // original (downscaled) logo canvas
+  var FONT = 'Georgia, "Times New Roman", serif';
+
+  var $ = function(id){ return document.getElementById(id); };
+  var nameEl = $('brandName'), tagEl = $('tagline'), rmEl = $('removeWhite');
+
+  function brand(){ return (nameEl.value || 'OS GLOBAL').trim().toUpperCase(); }
+  function tag(){ return (tagEl.value || '').trim(); }
+  function slug(){ return (brand().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')) || 'brand'; }
+
+  /* ---------- drawing helpers ---------- */
+  function goldGrad(ctx,x0,y0,x1,y1){
+    var g = ctx.createLinearGradient(x0,y0,x1,y1);
+    g.addColorStop(0,'#8a6a1c'); g.addColorStop(.25,'#f3d76f'); g.addColorStop(.5,'#fff3b8');
+    g.addColorStop(.75,'#d4af37'); g.addColorStop(1,'#8a6a1c');
+    return g;
+  }
+  function spaced(ctx,sp){ if('letterSpacing' in ctx) ctx.letterSpacing = sp+'px'; }
+  function drawText(ctx,str,x,y,size,o){
+    o = o || {};
+    ctx.save();
+    ctx.font = (o.weight||'700')+' '+size+'px '+FONT;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    spaced(ctx, o.spacing||0);
+    var w = ctx.measureText(str).width || 100;
+    if(o.shadow){ ctx.shadowColor = o.shadow; ctx.shadowBlur = o.blur||20; }
+    if(o.stroke){ ctx.lineWidth = o.strokeW||4; ctx.strokeStyle = o.stroke; ctx.strokeText(str,x,y); }
+    ctx.fillStyle = o.color || goldGrad(ctx,x-w/2,y,x+w/2,y);
+    if(o.alpha!=null) ctx.globalAlpha = o.alpha;
+    ctx.fillText(str,x,y);
+    ctx.restore();
+  }
+  function drawLogo(ctx,cx,cy,maxW,maxH,alpha){
+    if(!logo) return;
+    var r = Math.min(maxW/logo.width, maxH/logo.height);
+    var w = logo.width*r, h = logo.height*r;
+    ctx.save();
+    if(alpha!=null) ctx.globalAlpha = alpha;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(logo, cx-w/2, cy-h/2, w, h);
+    ctx.restore();
+  }
+  function line(ctx,x0,y0,x1,y1,w,alpha){
+    ctx.save(); ctx.strokeStyle = goldGrad(ctx,x0,y0,x1,y1); ctx.lineWidth = w; ctx.globalAlpha = alpha==null?1:alpha;
+    ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke(); ctx.restore();
+  }
+  function frame(ctx,x,y,w,h,lw){
+    ctx.save(); ctx.strokeStyle = goldGrad(ctx,x,y,x+w,y+h); ctx.lineWidth = lw; ctx.strokeRect(x,y,w,h); ctx.restore();
+  }
+  function diamond(ctx,x,y,s){
+    ctx.save(); ctx.fillStyle = goldGrad(ctx,x-s,y-s,x+s,y+s);
+    ctx.beginPath(); ctx.moveTo(x,y-s); ctx.lineTo(x+s,y); ctx.lineTo(x,y+s); ctx.lineTo(x-s,y); ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+  function glow(ctx,cx,cy,r,a){
+    var g = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+    g.addColorStop(0,'rgba(212,175,55,'+a+')'); g.addColorStop(1,'rgba(212,175,55,0)');
+    ctx.fillStyle = g; ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+  }
+  function rrect(ctx,x,y,w,h,r){
+    ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+  }
+
+  /* ---------- the 6 designs ---------- */
+  var DESIGNS = [
+    { id:'business-card', title:'Business Card', w:1050, h:600, checker:false, draw:function(ctx,w,h){
+      ctx.fillStyle = '#050505'; ctx.fillRect(0,0,w,h);
+      glow(ctx,w/2,h/2,420,.18);
+      frame(ctx,24,24,w-48,h-48,4);
+      frame(ctx,42,42,w-84,h-84,1.5);
+      [[42,42],[w-42,42],[42,h-42],[w-42,h-42]].forEach(function(p){ diamond(ctx,p[0],p[1],11); });
+      drawLogo(ctx,w/2,h/2-35,380,230);
+      line(ctx,w/2-160,h/2+120,w/2+160,h/2+120,2);
+      drawText(ctx,brand(),w/2,h/2+168,40,{spacing:8});
+      if(tag()) drawText(ctx,tag().toUpperCase(),w/2,h/2+215,18,{spacing:6,weight:'400'});
+    }},
+    { id:'letterhead', title:'Letterhead', w:1240, h:1754, checker:false, draw:function(ctx,w,h){
+      ctx.fillStyle = '#fbf8f0'; ctx.fillRect(0,0,w,h);
+      // header band
+      ctx.fillStyle = '#050505'; ctx.fillRect(0,0,w,310);
+      ctx.fillStyle = goldGrad(ctx,0,0,w,0); ctx.fillRect(0,310,w,8);
+      drawLogo(ctx,w/2,125,340,160);
+      drawText(ctx,brand(),w/2,245,40,{spacing:10});
+      if(tag()) drawText(ctx,tag().toUpperCase(),w/2,286,15,{spacing:6,weight:'400'});
+      // faint centre watermark
+      drawLogo(ctx,w/2,h/2+40,560,560,.07);
+      // body placeholder lines
+      ctx.save(); ctx.strokeStyle = 'rgba(138,106,28,.25)'; ctx.lineWidth = 2;
+      for(var y=470;y<h-220;y+=62){ ctx.beginPath(); ctx.moveTo(120,y); ctx.lineTo(w-120,y); ctx.stroke(); }
+      ctx.restore();
+      drawText(ctx,'Date: ____ / ____ / ________',260,400,24,{color:'#7a6322',weight:'400'});
+      // footer
+      ctx.fillStyle = '#050505'; ctx.fillRect(0,h-110,w,110);
+      ctx.fillStyle = goldGrad(ctx,0,0,w,0); ctx.fillRect(0,h-118,w,8);
+      drawText(ctx,'www.yourbrand.com   •   +234 000 000 0000   •   hello@yourbrand.com',w/2,h-55,24,{spacing:2,weight:'400'});
+    }},
+    { id:'tshirt-mockup', title:'T-Shirt Mockup', w:1000, h:1000, checker:false, draw:function(ctx,w,h){
+      var bg = ctx.createRadialGradient(w/2,h/2,50,w/2,h/2,720);
+      bg.addColorStop(0,'#2b2410'); bg.addColorStop(1,'#050505');
+      ctx.fillStyle = bg; ctx.fillRect(0,0,w,h);
+      function tee(){
+        ctx.beginPath();
+        ctx.moveTo(380,140); ctx.quadraticCurveTo(500,235,620,140);
+        ctx.lineTo(780,190); ctx.lineTo(930,370); ctx.lineTo(810,440); ctx.lineTo(750,385);
+        ctx.lineTo(750,880); ctx.quadraticCurveTo(500,915,250,880);
+        ctx.lineTo(250,385); ctx.lineTo(190,440); ctx.lineTo(70,370); ctx.lineTo(220,190);
+        ctx.closePath();
+      }
+      ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.7)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 20;
+      tee(); ctx.fillStyle = '#000'; ctx.fill(); ctx.restore();
+      var g = ctx.createLinearGradient(0,140,0,900);
+      g.addColorStop(0,'#1d1d1d'); g.addColorStop(.5,'#0c0c0c'); g.addColorStop(1,'#050505');
+      tee(); ctx.fillStyle = g; ctx.fill();
+      ctx.lineWidth = 3; ctx.strokeStyle = '#2c2c2c'; ctx.stroke();
+      // sleeve seams + fold shading
+      ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.06)'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(220,190); ctx.lineTo(250,385); ctx.moveTo(780,190); ctx.lineTo(750,385); ctx.stroke(); ctx.restore();
+      // collar
+      ctx.save(); ctx.lineWidth = 12; ctx.strokeStyle = goldGrad(ctx,380,0,620,0);
+      ctx.beginPath(); ctx.moveTo(384,146); ctx.quadraticCurveTo(500,246,616,146); ctx.stroke(); ctx.restore();
+      drawLogo(ctx,w/2,470,300,280);
+      drawText(ctx,brand(),w/2,650,32,{spacing:8});
+      line(ctx,w/2-110,690,w/2+110,690,2);
+    }},
+    { id:'shop-sign-mockup', title:'Shop Sign Mockup', w:1400, h:700, checker:false, draw:function(ctx,w,h){
+      var bg = ctx.createLinearGradient(0,0,0,h);
+      bg.addColorStop(0,'#1a1a1a'); bg.addColorStop(1,'#0a0a0a');
+      ctx.fillStyle = bg; ctx.fillRect(0,0,w,h);
+      // brick lines
+      ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.045)'; ctx.lineWidth = 2;
+      for(var y=0,row=0;y<h;y+=50,row++){
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+        for(var x=(row%2?50:0);x<w;x+=100){ ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+50); ctx.stroke(); }
+      }
+      ctx.restore();
+      glow(ctx,w/2,h/2,650,.16);
+      // hanging rods
+      line(ctx,330,0,330,170,6); line(ctx,1070,0,1070,170,6);
+      // board
+      ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 25;
+      rrect(ctx,200,170,1000,370,22); ctx.fillStyle = '#050505'; ctx.fill(); ctx.restore();
+      ctx.save(); ctx.lineWidth = 8; ctx.strokeStyle = goldGrad(ctx,200,170,1200,540);
+      rrect(ctx,200,170,1000,370,22); ctx.stroke();
+      ctx.lineWidth = 2; rrect(ctx,222,192,956,326,14); ctx.stroke(); ctx.restore();
+      drawLogo(ctx,w/2,325,520,200);
+      drawText(ctx,brand(),w/2,455,58,{spacing:12,shadow:'rgba(243,215,111,.55)',blur:24});
+      if(tag()) drawText(ctx,tag().toUpperCase(),w/2,500,18,{spacing:8,weight:'400'});
+      // pavement
+      var fl = ctx.createLinearGradient(0,620,0,h); fl.addColorStop(0,'#141414'); fl.addColorStop(1,'#000');
+      ctx.fillStyle = fl; ctx.fillRect(0,620,w,h-620); line(ctx,0,620,w,620,3,.6);
+    }},
+    { id:'instagram-profile', title:'Instagram Profile Circle', w:1080, h:1080, checker:false, draw:function(ctx,w,h){
+      ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
+      glow(ctx,w/2,h/2,620,.22);
+      ctx.save(); ctx.lineWidth = 16; ctx.strokeStyle = goldGrad(ctx,0,0,w,h);
+      ctx.beginPath(); ctx.arc(w/2,h/2,480,0,Math.PI*2); ctx.stroke();
+      ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(w/2,h/2,450,0,Math.PI*2); ctx.stroke(); ctx.restore();
+      ctx.save(); ctx.beginPath(); ctx.arc(w/2,h/2,436,0,Math.PI*2); ctx.clip();
+      var g = ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,436); g.addColorStop(0,'#1c1608'); g.addColorStop(1,'#050505');
+      ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+      drawLogo(ctx,w/2,h/2,560,560);
+      ctx.restore();
+    }},
+    { id:'watermark', title:'Watermark (Transparent)', w:1200, h:1200, checker:true, draw:function(ctx,w,h){
+      ctx.clearRect(0,0,w,h);
+      drawLogo(ctx,w/2,h/2-30,620,560,.55);
+      drawText(ctx,brand(),w/2,h/2+330,56,{spacing:14,alpha:.7,stroke:'rgba(0,0,0,.35)',strokeW:6});
+    }}
+  ];
+
+  /* ---------- build cards ---------- */
+  var cardsEl = $('cards');
+  DESIGNS.forEach(function(d){
+    var card = document.createElement('div'); card.className = 'card';
+    var h2 = document.createElement('h2'); h2.textContent = d.title;
+    var stage = document.createElement('div'); stage.className = 'stage' + (d.checker?' checker':'');
+    var cv = document.createElement('canvas'); cv.width = d.w; cv.height = d.h;
+    stage.appendChild(cv);
+    var dim = document.createElement('div'); dim.className = 'dim'; dim.textContent = d.w+' × '+d.h+' px';
+    var btn = document.createElement('button'); btn.className = 'btn small'; btn.type = 'button'; btn.textContent = '⬇ Download PNG';
+    btn.addEventListener('click', function(){ download(d); });
+    card.appendChild(h2); card.appendChild(stage); card.appendChild(dim); card.appendChild(btn);
+    cardsEl.appendChild(card);
+    d.canvas = cv;
+  });
+
+  function render(){
+    DESIGNS.forEach(function(d){
+      var ctx = d.canvas.getContext('2d');
+      ctx.clearRect(0,0,d.w,d.h);
+      d.draw(ctx,d.w,d.h);
+    });
+  }
+
+  function download(d){
+    d.canvas.toBlob(function(blob){
+      if(!blob) return;
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = slug()+'-'+d.id+'.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+    }, 'image/png');
+  }
+
+  $('dlAll').addEventListener('click', function(){
+    DESIGNS.forEach(function(d,i){ setTimeout(function(){ download(d); }, i*700); });
+  });
+
+  /* ---------- logo handling ---------- */
+  function processLogo(){
+    if(!srcCanvas) return;
+    var c = document.createElement('canvas');
+    c.width = srcCanvas.width; c.height = srcCanvas.height;
+    var x = c.getContext('2d'); x.drawImage(srcCanvas,0,0);
+    if(rmEl.checked){
+      var img = x.getImageData(0,0,c.width,c.height), d = img.data;
+      for(var i=0;i<d.length;i+=4){
+        var m = Math.min(d[i],d[i+1],d[i+2]);
+        if(m>=242){ d[i+3] = 0; }
+        else if(m>=205){ d[i+3] = Math.round(d[i+3]*(242-m)/37); }
+      }
+      x.putImageData(img,0,0);
+    }
+    logo = c;
+    // preview
+    var pv = $('preview'); pv.innerHTML = '';
+    var p = document.createElement('canvas'); p.width = c.width; p.height = c.height;
+    p.getContext('2d').drawImage(c,0,0);
+    pv.appendChild(p);
+    cardsEl.classList.add('show');
+    $('dlAll').disabled = false;
+    render();
+  }
+
+  function cornersLookWhite(c){
+    var x = c.getContext('2d'), s = 6, pts = [[0,0],[c.width-s,0],[0,c.height-s],[c.width-s,c.height-s]], white = 0;
+    pts.forEach(function(p){
+      var d = x.getImageData(p[0],p[1],s,s).data, ok = true;
+      for(var i=0;i<d.length;i+=4){ if(d[i+3]<20) continue; if(Math.min(d[i],d[i+1],d[i+2])<235){ ok=false; break; } }
+      if(ok) white++;
+    });
+    return white>=3;
+  }
+
+  $('logoInput').addEventListener('change', function(e){
+    var f = e.target.files && e.target.files[0];
+    if(!f) return;
+    if(!/^image\/(png|jpe?g)$/i.test(f.type) && !/\.(png|jpe?g)$/i.test(f.name)){
+      $('logoInfo').textContent = 'Please choose a PNG or JPG file.'; return;
+    }
+    var url = URL.createObjectURL(f);
+    var im = new Image();
+    im.onload = function(){
+      var max = 1400, r = Math.min(1, max/Math.max(im.naturalWidth, im.naturalHeight));
+      var c = document.createElement('canvas');
+      c.width = Math.max(1,Math.round(im.naturalWidth*r)); c.height = Math.max(1,Math.round(im.naturalHeight*r));
+      c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+      srcCanvas = c;
+      URL.revokeObjectURL(url);
+      rmEl.checked = cornersLookWhite(c);
+      var nm = f.name.length>26 ? f.name.slice(0,23)+'…' : f.name;
+      $('logoInfo').textContent = nm+' • '+im.naturalWidth+'×'+im.naturalHeight;
+      processLogo();
+    };
+    im.onerror = function(){ $('logoInfo').textContent = 'Could not read that image. Try another file.'; };
+    im.src = url;
+  });
+
+  rmEl.addEventListener('change', processLogo);
+  var t;
+  function later(){ clearTimeout(t); t = setTimeout(function(){ if(logo) render(); }, 120); }
+  nameEl.addEventListener('input', later);
+  tagEl.addEventListener('input', later);
+})();
+</script>
+</body>
+</html>
